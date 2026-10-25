@@ -1,0 +1,51 @@
+<%- include('partials/header'); -%>
+
+<form>
+	<h2>Login</h2>
+	<lable for="email">Email</lable>
+	<input type="text" name="email" required placeholder="Enter your email">
+	<div class="email error"></div>
+	<lable for="password">Password</lable>
+	<input type="password" name="password" required placeholder="Create a password">
+	<div class="password error"></div>
+	<button>Login</button>
+</form>
+
+<script>
+	// Grab forms email and password values
+	const form = document.querySelector('form');
+	const emailError = document.querySelector('.email.error');
+	const passwordError = document.querySelector('.password.error');
+	
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		// Reset error messages
+		emailError.textContent = '';
+		passwordError.textContent = '';
+		// Get values
+		const email = form.email.value;
+		const password = form.password.value;
+		//console.log(email, password);
+		// Connect frontend to backend
+		try {
+			const res = await fetch('/login', {
+				method: 'POST',
+				body: JSON.stringify({ email, password }),
+				headers: { 'Content-Type': 'application/json' }
+			});
+			const data = await res.json();
+			console.log(data);
+			if (data.errors) {
+				emailError.textContent = data.errors.email;
+				passwordError.textContent = data.errors.password;
+			}
+			if (data.user) {
+				location.assign('/'); // Redirect to home page
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	});
+</script>
+
+<%- include('partials/footer'); -%>

@@ -1,0 +1,64 @@
+<%- include('partials/header'); -%>
+
+<form>
+	<h1>Dog</h1>
+	<label for="name">Name</label>
+	<input
+        type="text"
+        name="name"
+        required
+        placeholder="Enter name">
+	<div class="name error"></div>
+
+	<label for="description">Description</label>
+	<input
+        type="text"
+        name="description"
+        required
+        placeholder="Describe your dog">
+	<div class="description error"></div>
+	<button>Submit</button>
+</form>
+
+<script>
+    // Grab forms name and description values
+    const form = document.querySelector('form');
+    const nameError = document.querySelector('.name.error');
+    const descriptionError = document.querySelector('.description.error');
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Reset error messages
+        nameError.textContent = '';
+        descriptionError.textContent = '';
+
+        // Get values
+        const name = form.name.value;
+        const description = form.description.value;
+
+        //console.log(name, description);
+        
+        // Connect frontend to backend
+        try {
+            const res = await fetch('/dogs', {
+                method: 'POST',
+                body: JSON.stringify({ name, description }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            console.log(data);
+            if (data.errors) {
+                nameError.textContent = data.errors.name;
+                descriptionError.textContent = data.errors.description;
+            }
+            if (data.dog) {
+                location.assign('/'); // Redirect to home page
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+</script>
+
+<%- include('partials/footer'); -%>
